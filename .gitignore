@@ -1,0 +1,4 @@
+dataset/*
+*.mp4
+test_images/*
+*.pyc
