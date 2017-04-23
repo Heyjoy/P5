@@ -1,11 +1,9 @@
 import numpy as np
 import cv2
 from extraction import *
-import datafield
-def find_cars(img, ystart, ystop, scale, svc = df.svc, X_scaler= df.XScaler,
-    orient = df.orient, pix_per_cell =df.pix_per_cell,cell_per_block= df.cell_per_block,
-    spatial_size=df.spatial_size, hist_bins=df.hist_bins,
-    spatial_feat=df.spatial_feat,hist_feat=df.hist_feat,hog_feat =df.hog_feat):
+def find_cars(img, ystart, ystop, scale, svc, X_scaler, orient,
+                pix_per_cell,cell_per_block, spatial_size, hist_bins,
+                spatial_feat,hist_feat,hog_feat):
 
     draw_img = np.copy(img)
     img = img.astype(np.float32)/255
@@ -62,7 +60,7 @@ def find_cars(img, ystart, ystop, scale, svc = df.svc, X_scaler= df.XScaler,
             if hist_feat == True:
                 test_features = X_scaler.transform(np.hstack((spatial_features, hist_features, hog_features)).reshape(1, -1))
             else:
-                test_features = X_scaler.transform(np.hstack((shape_feat, hist_feat)).reshape(1, -1))
+                test_features = X_scaler.transform(np.hstack((spatial_features, hog_features)).reshape(1, -1))
             test_prediction = svc.predict(test_features)
 
             if test_prediction == 1:

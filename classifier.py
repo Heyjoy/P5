@@ -41,12 +41,14 @@ def datasetPrepare():
     rand_state = np.random.randint(0, 100)
     #update to the datafield
     df.XScaler = X_scaler
+    shuffle(scaled_X,y)
     df.X_train, df.X_test, df.y_train, df.y_test = train_test_split(scaled_X, y,
                     test_size= df.TrainTestSplitSize,random_state=rand_state)
 def trainSVC():
     svc = LinearSVC()
     # Check the training time for the SVC
     t=time.time()
+    shuffle(df.X_train,df.y_train)
     svc.fit(df.X_train, df.y_train)
     t2 = time.time()
     print(round(t2-t, 2), 'Seconds to train SVC...')
@@ -54,7 +56,7 @@ def trainSVC():
     print('Test Accuracy of SVC = ', round(svc.score(df.X_test, df.y_test), 4))
     # Check the prediction time for a single sample
     t=time.time()
-    n_predict = 10
+    n_predict = 20
     print('My SVC predicts: ', svc.predict(df.X_test[0:n_predict]))
     print('For these',n_predict, 'labels: ', df.y_test[0:n_predict])
     t2 = time.time()

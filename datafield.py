@@ -22,6 +22,10 @@ class datafield():
         self.hog_feat = True
         self.svc = None
         self.XScaler = None
+        self.sliding_window = {'scale':[0.6, 0.8, 1.2, 1.6, 2, 2.2], 
+                  'ystart':[400, 400, 400, 350, 350, 350],
+                  'ystop': [520, 520, 620, 620, 656, 656],
+                  'cells_per_step': [3, 3, 1, 1, 1, 1]}
 
     def dataSave(self):
     #save current datafile parameters to .p file
@@ -48,6 +52,7 @@ class datafield():
     def dataLoad(self):
     #load the parameters from the .p file
         svc_pickle = pickle.load( open("SVC.p", "rb" ))
+        print(svc_pickle)
         self.color_space = svc_pickle['color_space']
         self.spatial_size = svc_pickle['spatial_size']
         self.hist_bins =svc_pickle['hist_bins']

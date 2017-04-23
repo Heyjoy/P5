@@ -55,7 +55,7 @@ def color_hist(img, nbins=32, bins_range=(0, 256)):
     # Concatenate the histograms into a single feature vector
     hist_features = np.concatenate((rhist[0], ghist[0], bhist[0]))
     # Return the individual histograms, bin_centers and feature vector
-    return rhist, ghist, bhist, bin_centers, hist_features
+    return hist_features
 
 def extract_features(imgs, color_space='RGB', spatial_size=(32, 32),
                         hist_bins=32, orient=9,
@@ -102,7 +102,7 @@ def single_img_features(img, color_space='RGB', spatial_size=(32, 32),
         img_features.append(spatial_features)
     #5) Compute histogram features if flag is set
     if hist_feat == True:
-        rhist, ghist, bhist, bin_centers, hist_features = color_hist(feature_image, nbins=hist_bins)
+        hist_features = color_hist(feature_image, nbins=hist_bins)
         #6) Append features to list
         img_features.append(hist_features)
     #7) Compute HOG features if flag is set
