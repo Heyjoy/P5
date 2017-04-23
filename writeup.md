@@ -70,13 +70,13 @@ I tried various combinations of parameters and find out the `pixels_per_cell=(8,
 I trained a linear SVM using `spatial features`, `hist features`, `hog features`.
 you can find these function at `extraction.py`
 
-A linear support Vector Machine classifier is trained.
+A **Linear Support Vector Machine Classifier** is trained by the mentioned features.
 
 ### Sliding Window Search
 
-####1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
+#### 1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
 
-I decided to search random window positions at random scales all over the image and came up with this (ok just kidding I didn't actually ;):
+:
 
 ![alt text][image3]
 

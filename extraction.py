@@ -94,7 +94,7 @@ def single_img_features(img, color_space='RGB', spatial_size=(32, 32),
         img_features.append(spatial_features)
     #5) Compute histogram features if flag is set
     if hist_feat == True:
-        hist_features = color_hist(feature_image, nbins=hist_bins)
+        rhist, ghist, bhist, bin_centers, hist_features = color_hist(feature_image, nbins=hist_bins)
         #6) Append features to list
         img_features.append(hist_features)
     #7) Compute HOG features if flag is set
