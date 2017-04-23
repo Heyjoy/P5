@@ -10,10 +10,22 @@ from pathlib import Path
 import pickle
 from datafield import *
 
+def oneFifth(srcList):
+    cnt = 0
+    resList = []
+    for it in srcList:
+        if cnt >= 5:
+            resList.append(it)
+            cnt = 0
+        else:
+            cnt=cnt+1
+    return resList
+
 def datasetInit():
     #images = glob.glob('dataset/*/*.png')
-    df.cars = glob.glob('dataset/vehicles/*/*.png')
-    df.notcars = glob.glob('dataset/non-vehicles/*/*.png')
+    df.cars = shuffle(glob.glob('dataset/vehicles/*/*.png'))
+    df.notcars = shuffle(glob.glob('dataset/non-vehicles/*/*.png'))
+
     print("import carsample:{} non-car sample:{}".format(len(df.cars),len(df.notcars)))
     #for image in images:
     #    if 'image' in image or 'extra' in image:
@@ -30,20 +42,22 @@ def datasetPrepare():
                             df.hist_bins, df.orient,
                             df.pix_per_cell, df.cell_per_block, df.hog_channel,
                             df.spatial_feat, df.hist_feat, df.hog_feat,False)
+
     X = np.vstack((carFeatures, notcarFeatures)).astype(np.float64)
     # Fit a per-column scaler
     X_scaler = StandardScaler().fit(X)
     # Apply the scaler to X
     scaled_X = X_scaler.transform(X)
-
+    #print("car sample{},{},{}".format(len(df.cars),len(carFeatures),len(scaled_X)))
     y = np.hstack((np.ones(len(carFeatures)), np.zeros(len(notcarFeatures))))
     # Split up data into randomized training and test sets
-    rand_state = np.random.randint(0, 100)
+    rand_state = 60
     #update to the datafield
     df.XScaler = X_scaler
     shuffle(scaled_X,y)
     df.X_train, df.X_test, df.y_train, df.y_test = train_test_split(scaled_X, y,
                     test_size= df.TrainTestSplitSize,random_state=rand_state)
+    print("have {} train sample, and {} test sample".format(len(df.X_train),len(df.X_test)))
 def trainSVC():
     svc = LinearSVC()
     # Check the training time for the SVC
@@ -54,13 +68,6 @@ def trainSVC():
     print(round(t2-t, 2), 'Seconds to train SVC...')
     # Check the score of the SVC
     print('Test Accuracy of SVC = ', round(svc.score(df.X_test, df.y_test), 4))
-    # Check the prediction time for a single sample
-    t=time.time()
-    n_predict = 20
-    print('My SVC predicts: ', svc.predict(df.X_test[0:n_predict]))
-    print('For these',n_predict, 'labels: ', df.y_test[0:n_predict])
-    t2 = time.time()
-    print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
     # update to the datafield
     df.svc = svc
 def dataInit():

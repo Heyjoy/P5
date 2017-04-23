@@ -5,24 +5,24 @@ class datafield():
     def __init__(self):
         self.cars = []
         self.notcars = []
-        self.TrainTestSplitSize = 0.2
+        self.TrainTestSplitSize = 0.8
         self.X_train, self.X_test, self.y_train, self.y_test = None,None,None,None
 
         # will save/load parameters with *.p file
         # if changed should delete the p file and runing  code again.
-        self.color_space = 'YCrCb'  # RGB, HSV, LUV, HLS, YUV, YCrCb
+        self.color_space = 'YUV'  # RGB, HSV, LUV, HLS, YUV, YCrCb
         self.spatial_size = (8, 8)
         self.hist_bins = 16  # Number of histogram bins
-        self.orient = 12  # HOG orientations
+        self.orient = 9  # HOG orientations
         self.pix_per_cell = 8  # HOG pixels per cell
         self.cell_per_block = 2  # HOG cells per block
         self.hog_channel = "ALL"  # 0, 1, 2, or "ALL"
         self.spatial_feat = True
-        self.hist_feat = False
+        self.hist_feat = True
         self.hog_feat = True
         self.svc = None
         self.XScaler = None
-        self.sliding_window = {'scale':[0.6, 0.8, 1.2, 1.6, 2, 2.2], 
+        self.sliding_window = {'scale':[0.6, 0.8, 1.2, 1.6, 2, 2.2],
                   'ystart':[400, 400, 400, 350, 350, 350],
                   'ystop': [520, 520, 620, 620, 656, 656],
                   'cells_per_step': [3, 3, 1, 1, 1, 1]}
@@ -52,7 +52,7 @@ class datafield():
     def dataLoad(self):
     #load the parameters from the .p file
         svc_pickle = pickle.load( open("SVC.p", "rb" ))
-        print(svc_pickle)
+        #print(svc_pickle)
         self.color_space = svc_pickle['color_space']
         self.spatial_size = svc_pickle['spatial_size']
         self.hist_bins =svc_pickle['hist_bins']
