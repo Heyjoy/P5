@@ -180,7 +180,7 @@ def heatmap(image,box_list):
     heat = add_heat(heat,box_list)
 
     # Apply threshold to help remove false positives
-    heat = apply_threshold(heat,1)
+    heat = apply_threshold(heat,2)
 
     # Visualize the heatmap when displaying
     heatmap = np.clip(heat, 0, 255)
@@ -197,3 +197,5 @@ def heatmap(image,box_list):
     plt.imshow(heatmap, cmap='hot')
     plt.title('Heat Map')
     fig.tight_layout()
+    plt.show()
+    return draw_img
