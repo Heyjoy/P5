@@ -35,7 +35,7 @@ def find_cars(img, ystart, ystop, scale,cells_per_step,svc, X_scaler, orient,
     hog1 = get_hog_features(ch1, orient, pix_per_cell, cell_per_block, feature_vec=False)
     hog2 = get_hog_features(ch2, orient, pix_per_cell, cell_per_block, feature_vec=False)
     hog3 = get_hog_features(ch3, orient, pix_per_cell, cell_per_block, feature_vec=False)
-
+    box_list =[]
     for xb in range(nxsteps):
         for yb in range(nysteps):
             ypos = yb*cells_per_step
@@ -69,10 +69,10 @@ def find_cars(img, ystart, ystop, scale,cells_per_step,svc, X_scaler, orient,
                 xbox_left = np.int(xleft*scale)
                 ytop_draw = np.int(ytop*scale)
                 win_draw = np.int(window*scale)
-
-                cv2.rectangle(draw_img,(xbox_left, ytop_draw+ystart),(xbox_left+win_draw,ytop_draw+win_draw+ystart),(0,0,255),6)
-
-    return draw_img
+                box =((xbox_left, ytop_draw+ystart),(xbox_left+win_draw,ytop_draw+win_draw+ystart))
+                cv2.rectangle(draw_img,box[0],box[1],(0,0,255),6)
+                box_list.append(box)
+    return draw_img,box_list
 
 def slide_window(img, x_start_stop=[None, None], y_start_stop=[None, None],
                     xy_window=(64, 64), xy_overlap=(0.5, 0.5)):

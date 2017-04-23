@@ -13,15 +13,16 @@ def pipeline(img):
 
     # 3. slide_window to find the cars
     # 3.1 half of
-    windows = slide_window(image, x_start_stop=[None, None], y_start_stop=[img.shap[0]/2,img.shape[0]],
+    draw_image = np.copy(image)
+    windows = detect.slide_window(image, x_start_stop=[None, None], y_start_stop=[int(img.shape[0]/2),int(img.shape[0])],
                     xy_window=(96, 96), xy_overlap=(0.5, 0.5))
 
-    hot_windows = search_windows(image, windows, svc, X_scaler, color_space=color_space,
-                        spatial_size=spatial_size, hist_bins=hist_bins,
-                        orient=orient, pix_per_cell=pix_per_cell,
-                        cell_per_block=cell_per_block,
-                        hog_channel=hog_channel, spatial_feat=spatial_feat,
-                        hist_feat=hist_feat, hog_feat=hog_feat)
+    hot_windows = detect.search_windows(image, windows, df.svc, df.XScaler, color_space=df.color_space,
+                        spatial_size=df.spatial_size, hist_bins=df.hist_bins,
+                        orient=df.orient, pix_per_cell=df.pix_per_cell,
+                        cell_per_block=df.cell_per_block,
+                        hog_channel=df.hog_channel, spatial_feat=df.spatial_feat,
+                        hist_feat=df.hist_feat, hog_feat=df.hog_feat)
     window_img = draw_boxes(draw_image, hot_windows, color=(0, 0, 255), thick=6)
     return window_img
 
@@ -29,7 +30,7 @@ def pipeline(img):
 # 2. train the classifier
 
 clf.dataInit()
-image = mpimg.imread('test_images/test1.jpg')
+image = mpimg.imread('test_images/test4.jpg')
 resImage = pipeline(image)
 #twoImagePlot(image,resImage)
 plt.imshow(resImage)
