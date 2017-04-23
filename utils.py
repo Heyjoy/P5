@@ -256,7 +256,7 @@ def draw_labeled_bboxes(img, labels):
     return img
 
 # plot method
-def twoImagePlot(image1,image2,title1 = 'Image1', title2 = 'Image2', color1=None,color2 ='gray',path = 'output_images/default.png'):
+def twoImagePlot(image1,image2,title1 = 'Image1', title2 = 'Image2', color1='gray',color2 ='gray',path = 'output_images/default.png'):
     plt.figure(1)
     plt.axis('off')
     plt.subplot(121)

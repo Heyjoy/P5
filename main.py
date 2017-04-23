@@ -11,14 +11,19 @@ def pipeline(image):
     # 3. slide_window to find the cars
     return image
 
-
 # 1. decide what features to use
 # 2. train the classifier
-clf.datasetInit()
-rand_car = np.random.choice(len(cars))
+svc = clf.getSVC()
+
+
+'''rand_car = np.random.choice(len(cars))
 rand_notcar = np.random.choice(len(notcars))
 this_car = mpimg.imread(cars[rand_car])
 this_notcar = mpimg.imread(notcars[rand_notcar])
-
-features = extraction.extract_features([cars[rand_car]],color_space='YCrCb',hog_channel='ALL',plot =True)
-#twoImagePlot(this_car,this_notcar,title1="car",title2 ="no car",path="output_images/car_not_car.png")
+print(rand_car,rand_notcar)
+rand_car = 1000
+rand_notcar = 2000
+features = extraction.extract_features([cars[rand_car]],color_space, spatial_size,
+                        hist_bins, orient,
+                        pix_per_cell, cell_per_block, hog_channel,
+                        spatial_feat, hist_feat, hog_feat,plot = True)'''

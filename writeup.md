@@ -11,7 +11,12 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 [image1]: ./output_images/car_not_car.png
-[image2]: ./examples/HOG_example.jpg
+[image2]: ./output_images/car0.png
+[image21]: ./output_images/car1.png
+[image22]: ./output_images/car2.png
+[image23]: ./output_images/no_car0.png
+[image24]: ./output_images/no_car1.png
+[image25]: ./output_images/no_car2.png
 [image3]: ./examples/sliding_windows.jpg
 [image4]: ./examples/sliding_window.jpg
 [image5]: ./examples/bboxes_and_heat.png
@@ -44,17 +49,30 @@ I then explored different color spaces and different `skimage.hog()` parameters 
 Here is an example using the `YCrCb` color space and HOG parameters of `orientations=8`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
 
 
-![alt text][image2]
+Car ![alt text][image2]
 
-####2. Explain how you settled on your final choice of HOG parameters.
+Car ![alt text][image21]
 
-I tried various combinations of parameters and...
+Car ![alt text][image22]
 
-####3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
+Not Car![alt text][image23]
 
-I trained a linear SVM using...
+Not Car![alt text][image24]
 
-###Sliding Window Search
+Not Car![alt text][image25]
+
+#### 2. Explain how you settled on your final choice of HOG parameters.
+
+I tried various combinations of parameters and find out the `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)` and `orientations=8` have the best training result.
+
+#### 3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
+
+I trained a linear SVM using `spatial features`, `hist features`, `hog features`.
+you can find these function at `extraction.py`
+
+A linear support Vector Machine classifier is trained.
+
+### Sliding Window Search
 
 ####1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
 

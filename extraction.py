@@ -63,7 +63,6 @@ def extract_features(imgs, color_space='RGB', spatial_size=(32, 32),
                                 hist_bins, orient,
                                 pix_per_cell, cell_per_block, hog_channel,
                                 spatial_feat, hist_feat, hog_feat,plot)
-
         # Append the new feature vector to the features list
         features.append(result)
     # Return list of feature vectors
@@ -107,7 +106,9 @@ def single_img_features(img, color_space='RGB', spatial_size=(32, 32),
                     hog_feature, hog_image = get_hog_features(feature_image[:,:,channel],
                                         orient, pix_per_cell, cell_per_block,
                                         vis=True, feature_vec=True)
-                    utils.twoImagePlot(img,hog_image)
+                    utils.twoImagePlot(feature_image[:,:,channel],hog_image,
+                        title1='{} CH {}'.format(color_space,channel),
+                        title2='HOG', path = 'output_images/car{}.png'.format(channel))
                 else:
                     hog_features.extend(get_hog_features(feature_image[:,:,channel],
                                     orient, pix_per_cell, cell_per_block,
