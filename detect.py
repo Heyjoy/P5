@@ -1,8 +1,11 @@
 import numpy as np
 import cv2
 from extraction import *
-
-def find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins):
+import datafield
+def find_cars(img, ystart, ystop, scale, svc = df.svc, X_scaler= df.XScaler,
+    orient = df.orient, pix_per_cell =df.pix_per_cell,cell_per_block= df.cell_per_block,
+    spatial_size=df.spatial_size, hist_bins=df.hist_bins,
+    spatial_feat=df.spatial_feat,hist_feat=df.hist_feat,hog_feat =df.hog_feat):
 
     draw_img = np.copy(img)
     img = img.astype(np.float32)/255
@@ -50,12 +53,16 @@ def find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, ce
             subimg = cv2.resize(ctrans_tosearch[ytop:ytop+window, xleft:xleft+window], (64,64))
 
             # Get color features
-            spatial_features = bin_spatial(subimg, size=spatial_size)
-            hist_features = color_hist(subimg, nbins=hist_bins)
+            if spatial_feat == True:
+                spatial_features = bin_spatial(subimg, size=spatial_size)
+            if hist_feat == True:
+                hist_features = color_hist(subimg, nbins=hist_bins)
 
             # Scale features and make a prediction
-            test_features = X_scaler.transform(np.hstack((spatial_features, hist_features, hog_features)).reshape(1, -1))
-            #test_features = X_scaler.transform(np.hstack((shape_feat, hist_feat)).reshape(1, -1))
+            if hist_feat == True:
+                test_features = X_scaler.transform(np.hstack((spatial_features, hist_features, hog_features)).reshape(1, -1))
+            else:
+                test_features = X_scaler.transform(np.hstack((shape_feat, hist_feat)).reshape(1, -1))
             test_prediction = svc.predict(test_features)
 
             if test_prediction == 1:
@@ -134,6 +141,7 @@ def search_windows(img, windows, clf, scaler, color_space='RGB',
         prediction = clf.predict(test_features)
         #7) If positive (prediction == 1) then save the window
         if prediction == 1:
+            print("findt car!")
             on_windows.append(window)
     #8) Return windows for positive detections
     return on_windows

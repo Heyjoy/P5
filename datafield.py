@@ -1,5 +1,6 @@
 # store
 import pickle
+
 class datafield():
     def __init__(self):
         self.cars = []
@@ -12,12 +13,12 @@ class datafield():
         self.color_space = 'YCrCb'  # RGB, HSV, LUV, HLS, YUV, YCrCb
         self.spatial_size = (8, 8)
         self.hist_bins = 16  # Number of histogram bins
-        self.orient = 8  # HOG orientations
+        self.orient = 12  # HOG orientations
         self.pix_per_cell = 8  # HOG pixels per cell
         self.cell_per_block = 2  # HOG cells per block
         self.hog_channel = "ALL"  # 0, 1, 2, or "ALL"
         self.spatial_feat = True
-        self.hist_feat = True
+        self.hist_feat = False
         self.hog_feat = True
         self.svc = None
         self.XScaler = None
@@ -59,4 +60,5 @@ class datafield():
         self.hog_feat = svc_pickle['hog_feat']
         self.svc = svc_pickle['svc']
         self.XScaler = svc_pickle['XScaler']
+
 df = datafield()

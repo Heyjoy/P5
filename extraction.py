@@ -4,6 +4,14 @@ import matplotlib.pyplot as plt
 from skimage.feature import hog
 import matplotlib.image as mpimg
 import utils
+
+def convert_color(img, conv='RGB2YCrCb'):
+    if conv == 'RGB2YCrCb':
+        return cv2.cvtColor(img, cv2.COLOR_RGB2YCrCb)
+    if conv == 'BGR2YCrCb':
+        return cv2.cvtColor(img, cv2.COLOR_BGR2YCrCb)
+    if conv == 'RGB2LUV':
+        return cv2.cvtColor(img, cv2.COLOR_RGB2LUV)
 # function from the lessons
 def get_hog_features(img, orient, pix_per_cell, cell_per_block, vis=False, feature_vec=True):
     if vis == True:
@@ -58,7 +66,7 @@ def extract_features(imgs, color_space='RGB', spatial_size=(32, 32),
     # Iterate through the list of images
     for file in imgs:
         # Read in each one by one
-        image = mpimg.imread(file)
+        image = cv2.imread(file)
         result = single_img_features(image, color_space, spatial_size,
                                 hist_bins, orient,
                                 pix_per_cell, cell_per_block, hog_channel,
@@ -109,10 +117,12 @@ def single_img_features(img, color_space='RGB', spatial_size=(32, 32),
                     utils.twoImagePlot(feature_image[:,:,channel],hog_image,
                         title1='{} CH {}'.format(color_space,channel),
                         title2='HOG', path = 'output_images/car{}.png'.format(channel))
+                    hog_features.append(hog_feature)
                 else:
                     hog_features.extend(get_hog_features(feature_image[:,:,channel],
                                     orient, pix_per_cell, cell_per_block,
                                     vis=False, feature_vec=True))
+            hog_features = np.ravel(hog_features)
         else:
             hog_features = get_hog_features(feature_image[:,:,hog_channel], orient,
                         pix_per_cell, cell_per_block, vis=False, feature_vec=True)

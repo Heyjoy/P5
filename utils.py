@@ -87,12 +87,6 @@ def data_look(car_list, notcar_list):
     return data_dict
 
 
-
-
-
-
-
-
 def add_heat(heatmap, bbox_list):
     # Iterate through list of bboxes
     for box in bbox_list:
