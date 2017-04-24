@@ -2,6 +2,9 @@ import numpy as np
 import cv2
 from extraction import *
 from scipy.ndimage.measurements import label
+from datafield import *
+
+heatmaps = collections.deque(maxlen=10)
 
 def find_cars(img, ystart, ystop, scale,cells_per_step,svc, X_scaler, orient,
                 pix_per_cell,cell_per_block, spatial_size, hist_bins,
@@ -72,7 +75,7 @@ def find_cars(img, ystart, ystop, scale,cells_per_step,svc, X_scaler, orient,
                 box =((xbox_left, ytop_draw+ystart),(xbox_left+win_draw,ytop_draw+win_draw+ystart))
                 cv2.rectangle(draw_img,box[0],box[1],(0,0,255),6)
                 box_list.append(box)
-    return draw_img,box_list
+    return box_list
 
 def slide_window(img, x_start_stop=[None, None], y_start_stop=[None, None],
                     xy_window=(64, 64), xy_overlap=(0.5, 0.5)):
@@ -174,28 +177,30 @@ def draw_labeled_bboxes(img, labels):
     # Return the image
     return img
 
-def heatmap(image,box_list):
+def heatmap(image,box_list,threshold=0):
     # Read in image similar to one shown above
     heat = np.zeros_like(image[:,:,0]).astype(np.float)
     heat = add_heat(heat,box_list)
-
     # Apply threshold to help remove false positives
-    heat = apply_threshold(heat,2)
+
+    heat = apply_threshold(heat,threshold)
+    df.heat = heat
 
     # Visualize the heatmap when displaying
-    heatmap = np.clip(heat, 0, 255)
-
+    current_heatmap = np.clip(heat, 0, 255)
+    df.heatmaps.append(current_heatmap)
+    heatmap_sum = sum(df.heatmaps)
     # Find final boxes from heatmap using label function
-    labels = label(heatmap)
+    labels = label(heatmap_sum)
     draw_img = draw_labeled_bboxes(np.copy(image), labels)
 
-    fig = plt.figure()
-    plt.subplot(121)
-    plt.imshow(draw_img)
-    plt.title('Car Positions')
-    plt.subplot(122)
-    plt.imshow(heatmap, cmap='hot')
-    plt.title('Heat Map')
-    fig.tight_layout()
-    plt.show()
+    # fig = plt.figure()
+    # plt.subplot(121)
+    # plt.imshow(draw_img)
+    # plt.title('Car Positions')
+    # plt.subplot(122)
+    # plt.imshow(heatmap, cmap='hot')
+    # plt.title('Heat Map')
+    # fig.tight_layout()
+    # plt.show()
     return draw_img
