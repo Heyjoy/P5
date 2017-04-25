@@ -187,8 +187,9 @@ def heatmapVedio(image,box_list,threshold=0):
     heatmap = add_heat(heatmap,box_list)
     # Apply threshold to help remove false positives
     df.heatmaps.append(heatmap)
-    heatmap = np.mean(df.heatmaps, axis=0)
     heatmap = apply_threshold(heatmap,threshold)
+    heatmap = sum(df.heatmaps)
+
     # Visualize the heatmap when displaying
     heatImage = np.clip(heatmap, 0, 255)
     # Find final boxes from heatmap using label function

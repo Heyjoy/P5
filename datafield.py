@@ -29,8 +29,7 @@ class datafield():
         self.XScaler = None
         self.heat = None
         self.heatThreshold = 1
-        #self.heatmaps = collections.deque(maxlen=4)
-        self.heatmaps = []
+        self.heatmaps = collections.deque(maxlen=10)
         self.cnt = 0
         # init function
         self._caculateWarpParameters()
