@@ -114,3 +114,98 @@ def threeImagePlot(image1,image2,image3,color='gray'):
     ax3.set_title('image3', fontsize=50)
     plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
     plt.show()
+class WarpPerspective(object):
+
+    def __init__(self, src=None, dst=None, img_size=(1280, 720)):
+        self.img_size = img_size
+        if src is None or dst is None:
+            xtr,ytr = 690,450   # x,y topRight
+            xbr,ybr = 1112,719  # x,y bottomRight
+            xbl,ybl = 223,719   # x,y bottomLeft
+            xtl,ytl = 596,450   # x,y topLeft
+
+            xtr_dst,ytr_dst = 960,0  # x,y topRight Destination
+            xbr_dst,ybr_dst = 960,720  # x,y bottomRight Destination
+            xbl_dst,ybl_dst = 320,720   # x,y bottomLeft Destination
+            xtl_dst,ytl_dst = 320,0   # x,y topLeft Destination
+
+            self.src = np.float32(
+                [[xtr,ytr],
+                 [xbr,ybr],
+                 [xbl,ybl],
+                 [xtl,ytl]])
+            self.dst = np.float32(
+                [[xtr_dst,ytr_dst],
+                 [xbr_dst,ybr_dst],
+                 [xbl_dst,ybl_dst],
+                 [xtl_dst,ytl_dst]])
+        else:
+            self.src = np.float32(src)
+            self.dst = np.float32(dst)
+        # Calculate transform matrix and inverse matrix
+        self.M = cv2.getPerspectiveTransform(self.src, self.dst)
+        self.M_inv = cv2.getPerspectiveTransform(self.dst, self.src)
+
+    def warp(self, img):
+        '''Warp an image from perspective view to bird view.'''
+        assert (img.shape[1], img.shape[0]) == self.img_size, 'Invalid image shape.'
+        return cv2.warpPerspective(img, self.M, self.img_size)
+
+    def warp_inv(self, img):
+        '''Warp inversely an image from bird view to perspective view.'''
+        assert (img.shape[1], img.shape[0]) == self.img_size, 'Invalid image shape.'
+        return cv2.warpPerspective(img, self.M_inv, self.img_size)
+
+
+class SlidingWindows(object):
+
+    def __init__(self, wp, imgsize=(1280, 720), sep=[25, 25]):
+        self.wp = wp
+        self.imgsize = imgsize
+        self.sep = sep  # grid point separation
+        self._make_grid_points()
+        self._make_sliding_windows()
+
+    def _make_grid_points(self):
+        '''Generate grid points in a bird view.'''
+        xsize, ysize = self.imgsize
+        self._xsteps = int(xsize / self.sep[0]) + 1
+        self._ysteps = int(ysize / self.sep[1])
+        grid = np.mgrid[0:self._xsteps, 0:self._ysteps]
+        self.grid_points = grid.T.reshape((-1, 2)) * self.sep
+        # Transform the grid points in a perspective view.
+        points_transformed = []
+        for point in self.grid_points:
+            coord = np.append(point, 1)
+            transformed = np.dot(self.wp.M_inv, coord)
+            point_transformed = (transformed[:2] / transformed[2]).astype(np.int)
+            points_transformed.append(point_transformed)
+        self.points_transformed = np.array(points_transformed)
+
+    def _select_ysteps(self, ysteps):
+        yseq = np.arange(ysteps - 1)
+        yseq_r = yseq[::-1]  # np.flipud(yseq)
+        n = np.int(np.sqrt(4 * ysteps + 0.25) + 0.5)
+        idx_list = []
+        for i in range(n-1):
+            tmp = np.int(i * (i+1) / 4)
+            idx_list.append(tmp)
+        idx_list = np.unique(idx_list)
+        return np.unique(np.append(yseq_r[idx_list], 0)[::-1])
+
+    def _make_sliding_windows(self):
+        window_list = []
+        xseq = range(self._xsteps)
+        yseq = self._select_ysteps(self._ysteps)
+        for yc in yseq:
+            xl = self.points_transformed[yc*self._xsteps][0]
+            xr = self.points_transformed[(yc+1)*self._xsteps-1][0]
+            width = int( (50/self.sep[0]) * (xr-xl) / (self._xsteps-1) )
+            for xc in xseq:
+                pos = yc*self._xsteps + xc
+                point = self.points_transformed[pos]
+                lu = point - np.array([0.5*width, 1.5*width], np.int).tolist()
+                rd = point + np.array([1.5*width, 0.5*width], np.int).tolist()
+                if 0 < lu[0] < self.imgsize[0] and rd[1] < self.imgsize[1]:
+                    window_list.append((tuple(lu), tuple(rd)))
+        self.windows = window_list

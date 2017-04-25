@@ -17,6 +17,7 @@ class datafield():
         self.color_space = 'YCrCb'  # RGB, HSV, LUV, HLS, YUV, YCrCb
         self.spatial_size = (32, 32)
         self.hist_bins = 32  # Number of histogram bins
+        self.hist_range = (0, 256)
         self.orient = 12  # HOG orientations
         self.pix_per_cell = 8  # HOG pixels per cell
         self.cell_per_block = 2  # HOG cells per block
@@ -28,7 +29,8 @@ class datafield():
         self.XScaler = None
         self.heat = None
         self.heatThreshold = 1
-        self.heatmaps = collections.deque(maxlen=4)
+        #self.heatmaps = collections.deque(maxlen=4)
+        self.heatmaps = []
         self.cnt = 0
         # init function
         self._caculateWarpParameters()

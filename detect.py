@@ -77,17 +77,17 @@ def find_cars(img, ystart, ystop, scale,cells_per_step,svc, X_scaler, orient,
                 box_list.append(box)
     return box_list
 
-def slide_window(img, x_start_stop=[None, None], y_start_stop=[None, None],
+def slide_window(imgSize=(1280,720), x_start_stop=[None, None], y_start_stop=[None, None],
                     xy_window=(64, 64), xy_overlap=(0.5, 0.5)):
     # If x and/or y start/stop positions not defined, set to image size
     if x_start_stop[0] == None:
         x_start_stop[0] = 0
     if x_start_stop[1] == None:
-        x_start_stop[1] = img.shape[1]
+        x_start_stop[1] = imgSize[0]
     if y_start_stop[0] == None:
         y_start_stop[0] = 0
     if y_start_stop[1] == None:
-        y_start_stop[1] = img.shape[0]
+        y_start_stop[1] = imgSize[1]
     # Compute the span of the region to be searched
     xspan = x_start_stop[1] - x_start_stop[0]
     yspan = y_start_stop[1] - y_start_stop[0]
@@ -158,6 +158,8 @@ def add_heat(heatmap, bbox_list):
     return heatmap
 def apply_threshold(heatmap, threshold):
     # Zero out pixels below the threshold
+    # heatmap = cv2.resize(heatmap, (80, 45))
+    # heatmap = cv2.resize(heatmap, (1280, 720))
     heatmap[heatmap <= threshold] = 0
     # Return thresholded map
     return heatmap
@@ -173,34 +175,36 @@ def draw_labeled_bboxes(img, labels):
         # Define a bounding box based on min/max x and y
         bbox = ((np.min(nonzerox), np.min(nonzeroy)), (np.max(nonzerox), np.max(nonzeroy)))
         # Draw the box on the image
-        cv2.rectangle(img, bbox[0], bbox[1], (0,0,255), 6)
+        cv2.rectangle(img, bbox[0], bbox[1], (0,0,255), 3)
     # Return the image
     return img
 
-def heatmap(image,box_list,threshold=0):
+def heatmapVedio(image,box_list,threshold=0):
+    #heatmap_sum = sum(df.heatmaps)
+    #heatmap_res = apply_threshold(heatmap_sum,threshold)
     # Read in image similar to one shown above
-    heat = np.zeros_like(image[:,:,0]).astype(np.float)
-    heat = add_heat(heat,box_list)
+    heatmap = np.zeros_like(image[:,:,0]).astype(np.float)
+    heatmap = add_heat(heatmap,box_list)
     # Apply threshold to help remove false positives
-
-    heat = apply_threshold(heat,threshold)
-    df.heat = heat
-
+    df.heatmaps.append(heatmap)
+    heatmap = np.mean(df.heatmaps, axis=0)
+    heatmap = apply_threshold(heatmap,threshold)
     # Visualize the heatmap when displaying
-    current_heatmap = np.clip(heat, 0, 255)
-    df.heatmaps.append(current_heatmap)
-    heatmap_sum = sum(df.heatmaps)
+    heatImage = np.clip(heatmap, 0, 255)
     # Find final boxes from heatmap using label function
-    labels = label(heatmap_sum)
-    draw_img = draw_labeled_bboxes(np.copy(image), labels)
+    labels = label(heatImage)
+    resultImage = draw_labeled_bboxes(np.copy(image), labels)
+    return heatImage,resultImage
 
-    # fig = plt.figure()
-    # plt.subplot(121)
-    # plt.imshow(draw_img)
-    # plt.title('Car Positions')
-    # plt.subplot(122)
-    # plt.imshow(heatmap, cmap='hot')
-    # plt.title('Heat Map')
-    # fig.tight_layout()
-    # plt.show()
-    return draw_img
+def heatmapImage(image,box_list,threshold=0):
+    # Read in image similar to one shown above
+    heatmap = np.zeros_like(image[:,:,0]).astype(np.float)
+    heatmap = add_heat(heatmap,box_list)
+    # Apply threshold to help remove false positives
+    heatmap = apply_threshold(heatmap,threshold)
+    # Visualize the heatmap when displaying
+    heatImage = np.clip(heatmap, 0, 255)
+    # Find final boxes from heatmap using label function
+    labels = label(heatImage)
+    resultImage = draw_labeled_bboxes(np.copy(image), labels)
+    return heatImage,resultImage

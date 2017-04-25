@@ -12,64 +12,53 @@ import time
 import warp
 def pipeline(img):
     draw_img =np.copy(img)
-    hotwindows = search_windows(draw_img,df.windowsList)
+    hotwindows = detect.search_windows(draw_img,df.windowsList,df.svc, df.XScaler,
+                        color_space=df.color_space,
+                        spatial_size=df.spatial_size, hist_bins=df.hist_bins,
+                        hist_range=df.hist_range, orient=df.orient,
+                        pix_per_cell=df.pix_per_cell, cell_per_block=df.cell_per_block,
+                        hog_channel=df.hog_channel, spatial_feat=df.spatial_feat,
+                        hist_feat=df.hist_feat, hog_feat=df.hog_feat)
 
-    # draw_img =np.copy(img)
-    # bbox_list = []
-    # ystart = 400
-    # ystop = 500
-    # scale = 1
-    # cells_per_step=1
-    # box_list=detect.find_cars(img, ystart, ystop, scale,cells_per_step,
-    #                 df.svc, df.XScaler, df.orient,df.pix_per_cell,df.cell_per_block,
-    #                 df.spatial_size, df.hist_bins,df.spatial_feat,df.hist_feat,df.hog_feat)
-    # bbox_list.extend(box_list)
-    # ystart = 400
-    # ystop = 656
-    # scale = 1.5
-    # cells_per_step=2
-    # box_list=detect.find_cars(img, ystart, ystop, scale,cells_per_step,
-    #                 df.svc, df.XScaler, df.orient,df.pix_per_cell,df.cell_per_block,
-    #                 df.spatial_size, df.hist_bins,df.spatial_feat,df.hist_feat,df.hog_feat)
-    # bbox_list.extend(box_list)
-    #
-    # heatmap,resultImage =detect.heatmapVedio(img,bbox_list,4)
-    rawboxes_img = draw_boxes(img,df.windowsList)
+
+
+    heatImage,resultImage =detect.heatmapVedio(img,hotwindows,0)
+    #heatImage,resultImage =detect.heatmapImage(img,hotwindows,0)
+    #rawboxes_img = draw_boxes(img,df.windowsList)
+    #result_img = draw_boxes(img,hotwindows)
     #df.cnt = df.cnt+1
-    return rawboxes_img
+    rgb=cv2.cvtColor(heatImage, cv2.COLOR_GRAY2BGR)
+    #result = cv2.addWeighted(draw_img, 1, heatImage3, 0.3, 0)
+    return rgb
 
 # 1. decide what features to use
 # 2. train the classifier
 clf.init()
 # 3. Create Slide Window List
-windows0 = detect.slide_window(y_start_stop=[368, 464], xy_overlap=(0.5, 0.5), xy_window=(32, 32))
-windows1 = detect.slide_window(y_start_stop=[400, 560], xy_overlap=(0.75, 0.75), xy_window=(64, 64))
-windows2 = detect.slide_window(y_start_stop=[464, 656], xy_overlap=(0.75, 0.75), xy_window=(128, 128))
-df.windowsList = windows0 + windows1 + windows2
+wp = WarpPerspective()
+sw = SlidingWindows(wp)
+df.windowsList = sw.windows
 
 
-# plt.figure(1)
+
 # plt.subplots(6, 3, figsize=(16, 28))
-
-# j = 1
-# for i in range(j):
+# j = 6
+# for i in range(6):
 #     img = plt.imread('test_images/test{}.jpg'.format(i+1), format='RGB')
-#     heatmap,result,rawboxes_img = pipeline(img)
-#     plt.subplot(j,3,i*3+1)
+#     heatmap,result = pipeline(img)
+#     plt.subplot(6,3,i*3+1)
 #     plt.imshow(heatmap, 'hot')
 #     if i == 0: plt.title('Heatmap')
-#     plt.subplot(j,3,i*3+2)
+#     plt.subplot(6,3,i*3+2)
 #     plt.imshow(result)
 #     if i == 0: plt.title('Result')
-#     plt.subplot(j,3,i*3+3)
-#     plt.imshow(rawboxes_img)
+#     plt.subplot(6,3,i*3+3)
+#     plt.imshow(img)
 #     if i == 0: plt.title('Raw')
 # plt.savefig('output_images/test_images_result.png')
 # plt.show()
-#
-# print( df.orient,df.pix_per_cell,df.cell_per_block,
-# df.spatial_size, df.hist_bins,df.spatial_feat,df.hist_feat,df.hog_feat)
-image = mpimg.imread('test_images/test1.jpg')
+
+image = mpimg.imread('test_images/test2.jpg')
 resImage = pipeline(image)
 #twoImagePlot(image,resImage)
 plt.imshow(resImage)
