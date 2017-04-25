@@ -2,19 +2,21 @@
 import pickle
 import numpy as np
 import collections
+import cv2
 
 class datafield():
     def __init__(self):
         self.cars = []
         self.notcars = []
-        self.TrainTestSplitSize = 0.2
+        self.TrainTestSplitSize = 0.8
         self.X_train, self.X_test, self.y_train, self.y_test = None,None,None,None
-
+        self.M = None
+        self.Minv = None
         # will save/load parameters with *.p file
         # if changed should delete the p file and runing  code again.
         self.color_space = 'YCrCb'  # RGB, HSV, LUV, HLS, YUV, YCrCb
-        self.spatial_size = (8, 8)
-        self.hist_bins = 16  # Number of histogram bins
+        self.spatial_size = (32, 32)
+        self.hist_bins = 32  # Number of histogram bins
         self.orient = 12  # HOG orientations
         self.pix_per_cell = 8  # HOG pixels per cell
         self.cell_per_block = 2  # HOG cells per block
@@ -25,7 +27,35 @@ class datafield():
         self.svc = None
         self.XScaler = None
         self.heat = None
-        self.heatmaps = collections.deque(maxlen=10)
+        self.heatThreshold = 1
+        self.heatmaps = collections.deque(maxlen=4)
+        self.cnt = 0
+        # init function
+        self._caculateWarpParameters()
+    def _caculateWarpParameters(self):
+        xtr,ytr = 690,450   # x,y topRight
+        xbr,ybr = 1112,719  # x,y bottomRight
+        xbl,ybl = 223,719   # x,y bottomLeft
+        xtl,ytl = 596,450   # x,y topLeft
+
+        xtr_dst,ytr_dst = 960,0  # x,y topRight Destination
+        xbr_dst,ybr_dst = 960,720  # x,y bottomRight Destination
+        xbl_dst,ybl_dst = 320,720   # x,y bottomLeft Destination
+        xtl_dst,ytl_dst = 320,0   # x,y topLeft Destination
+
+        src = np.float32(
+            [[xtr,ytr],
+             [xbr,ybr],
+             [xbl,ybl],
+             [xtl,ytl]])
+        dst = np.float32(
+            [[xtr_dst,ytr_dst],
+             [xbr_dst,ybr_dst],
+             [xbl_dst,ybl_dst],
+             [xtl_dst,ytl_dst]])
+        self.M = cv2.getPerspectiveTransform(src,dst)# transfer Matrix
+        self.Minv = cv2.getPerspectiveTransform(dst,src)
+        self.windowsList = None
     def dataSave(self):
     #save current datafile parameters to .p file
         svc_pickle = {

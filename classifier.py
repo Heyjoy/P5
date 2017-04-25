@@ -10,19 +10,21 @@ from pathlib import Path
 import pickle
 from datafield import *
 
-def oneFifth(srcList):
-    cnt = 0
-    resList = []
-    for it in srcList:
-        if cnt >= 5:
-            resList.append(it)
-            cnt = 0
-        else:
-            cnt=cnt+1
-    return resList
+def init():
+    trainedSVCPath = Path("SVC.p")
+    if trainedSVCPath.is_file(): # already trained
+        print("we have trained SVC, now loading...")
+        df.dataLoad()
+    else: # no trained model.
+        print("we have no trained SVC, now training....")
+        print("please runing the code later again")
+        datasetInit()
+        datasetPrepare()
+        trainSVC()
+        df.dataSave()
 
 def datasetInit():
-    #images = glob.glob('dataset/*/*.png')
+
     df.cars = shuffle(glob.glob('dataset/vehicles/*/*.png'))
     df.notcars = shuffle(glob.glob('dataset/non-vehicles/*/*.png'))
 
@@ -58,6 +60,7 @@ def datasetPrepare():
     df.X_train, df.X_test, df.y_train, df.y_test = train_test_split(scaled_X, y,
                     test_size= df.TrainTestSplitSize,random_state=rand_state)
     print("have {} train sample, and {} test sample".format(len(df.X_train),len(df.X_test)))
+
 def trainSVC():
     svc = LinearSVC()
     # Check the training time for the SVC
@@ -70,15 +73,3 @@ def trainSVC():
     print('Test Accuracy of SVC = ', round(svc.score(df.X_test, df.y_test), 4))
     # update to the datafield
     df.svc = svc
-def dataInit():
-    trainedSVCPath = Path("SVC.p")
-    if trainedSVCPath.is_file():
-        print("we have trained SVC, now loading...")
-        df.dataLoad()
-    else:
-        print("we have no trained SVC, now training....")
-        print("please runing the code later again")
-        datasetInit()
-        datasetPrepare()
-        trainSVC()
-        df.dataSave()
