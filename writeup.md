@@ -17,8 +17,9 @@ The goals / steps of this project are the following:
 [image23]: ./output_images/no_car0.png
 [image24]: ./output_images/no_car1.png
 [image25]: ./output_images/no_car2.png
-[image3]: ./examples/sliding_windows.jpg
-[image4]: ./examples/sliding_window.jpg
+[image3]: ./output_images/
+[image4]: ./output_images/scale2.png
+[image41]: ./output_images/scale1.png
 [image5]: ./output_images/bboxes_and_heat.png
 [image6]: ./examples/labels_map.png
 [image7]: ./examples/output_bboxes.png
@@ -94,16 +95,30 @@ A **Linear Support Vector Machine Classifier** is trained by the mentioned featu
 
 #### 1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
 
-:
+the silder window search, I tried the `perspective and vanishing point concepts`
+,but maybe the way I implemented is not so right, the processing speed are very slowa around `2 s/it`. The reslut are also similar as the `Hog Sub-sampling Window Search concept`.
 
-![alt text][image3]
+After these try, I choose the `Hog Sub-sampling Window Search concept` method, you can find the `find_car() `at `detect.py`.
+And for this concept, I setup two different scales: 1, 1,5
 
-####2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
+|Searches| scales | ystart | ystop | overlapping |
+|:-------| :------| :----- |:----|:------|
+|Search1 | 1.5    | 400 | 656|50%|
+|Search2 | 1      | 400 | 496| 50%|
+|...|...|...|...|...|
+
+actually here can use more different scales hot window search, but it will slow done the processing speed. Here has `3.5 it/s`.
+
+
+#### 2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
 Ultimately I searched on two scales using YCrCb 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
 
-![alt text][image4]
----
+Try with scale 1.5 ![alt text][image4]
+
+Try with scale 1 ![alt text][image41]
+
+
 
 ### Video Implementation
 
