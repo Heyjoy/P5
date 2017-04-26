@@ -182,11 +182,13 @@ def heatmap(image,box_list, threshold =0):
     heat = np.zeros_like(image[:,:,0]).astype(np.float)
     heat = add_heat(heat,box_list)
 
-    # historic heat have a decreasing factor. here use 0.8
-    # added up
-    heatSum = heat+np.mean(df.heatmaps)*0.8
+    # historic heat have a decreasing factor. here use 0.9
+
     # add the current heat to deque
     df.heatmaps.append(heat)
+    # added up
+    heatSum = sum(df.heatmaps)
+    print("the max poin at heatmap is {}".format(np.max(heatSum)))
 
     # Apply threshold to help remove false positives
     heatFilted = apply_threshold(heatSum,threshold)
@@ -203,8 +205,14 @@ def heatmapImage(image,box_list, threshold =0):
     heat = np.zeros_like(image[:,:,0]).astype(np.float)
     heat = add_heat(heat,box_list)
 
+    # historic heat have a decreasing factor. here use 1/2
+    # added up
+    heatSum = heat+np.mean(df.heatmaps)*0.9
+    # add the current heat to deque
+    df.heatmaps.append(heat)
+
     # Apply threshold to help remove false positives
-    heatFilted = apply_threshold(heat,threshold)
+    heatFilted = apply_threshold(heatSum,threshold)
     # Visualize the heatmap when displaying
     heatmap = np.clip(heatFilted, 0, 255)
 
