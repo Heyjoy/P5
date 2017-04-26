@@ -10,17 +10,6 @@ from pathlib import Path
 import pickle
 from datafield import *
 
-def oneFifth(srcList):
-    cnt = 0
-    resList = []
-    for it in srcList:
-        if cnt >= 5:
-            resList.append(it)
-            cnt = 0
-        else:
-            cnt=cnt+1
-    return resList
-
 def datasetInit():
     #images = glob.glob('dataset/*/*.png')
     df.cars = shuffle(glob.glob('dataset/vehicles/*/*.png'))
@@ -57,7 +46,7 @@ def datasetPrepare():
     shuffle(scaled_X,y)
     df.X_train, df.X_test, df.y_train, df.y_test = train_test_split(scaled_X, y,
                     test_size= df.TrainTestSplitSize,random_state=rand_state)
-    print("have {} train sample, and {} test sample".format(len(df.X_train),len(df.X_test)))
+    print("have {} train Features sample, and {} test Features sample".format(len(df.X_train),len(df.X_test)))
 def trainSVC():
     svc = LinearSVC()
     # Check the training time for the SVC

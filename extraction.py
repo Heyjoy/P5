@@ -131,3 +131,5 @@ def single_img_features(img, color_space='RGB', spatial_size=(32, 32),
 
     #9) Return concatenated array of features
     return np.concatenate(img_features)
+# 
+# def reportImagePlot():

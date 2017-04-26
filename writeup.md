@@ -34,6 +34,17 @@ The goals / steps of this project are the following:
 
 You're reading it!
 
+### Project files
+
+* main.py main function, creating the vedio and working steps for this project
+* detect.py main module, which have the car detect functions and result image creating.
+* classifier.py include the classifier related training methods and tools
+* extraction.py include features extraction tools and functions
+
+* datafield.py include all adjustable hyperparameters
+* utils.py include other support funtion.
+
+
 ### Histogram of Oriented Gradients (HOG)
 
 #### 1. Explain how (and identify where in your code) you extracted HOG features from the training images.
@@ -46,7 +57,7 @@ I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an 
 
 I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like.
 
-Here is an example using the `YCrCb` color space and HOG parameters of `orientations=8`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
+Here is an example using the `YCrCb` color space and HOG parameters of `orientations=9`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`, you can clearly find out the Hog of the car are different to the Not car pic.
 
 
 Car ![alt text][image2]
@@ -63,7 +74,14 @@ Not Car![alt text][image25]
 
 #### 2. Explain how you settled on your final choice of HOG parameters.
 
-I tried various combinations of parameters and find out the `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)` and `orientations=8` have the best training result.
+I tried various combinations of parameters and find out the `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)` and `orientations=9` have the best training result. the parameters set as follow:
+
+* Color Space：`'YCrCb'`, `'LUV'`also have similar good performance.
+* Orient：`9`, tried different HOG orientations.
+* Pix_per_cell: `8` , default value HOG pixels per cell
+* Cell_per_block: `2` , default value HOG cells per block
+* Hog_channel: `"ALL" `, can use 0, 1, 2, or "ALL", here I choose `ALL` for more features.
+
 
 #### 3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
