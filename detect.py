@@ -157,6 +157,8 @@ def add_heat(heatmap, bbox_list):
 def apply_threshold(heatmap, threshold):
     # Zero out pixels below the threshold
     heatmap[heatmap <= threshold] = 0
+    heatmap = cv2.resize(heatmap, (80, 45))
+    heatmap = cv2.resize(heatmap, (1280, 720))
     # Return thresholded map
     return heatmap
 
@@ -180,9 +182,9 @@ def heatmap(image,box_list, threshold =0):
     heat = np.zeros_like(image[:,:,0]).astype(np.float)
     heat = add_heat(heat,box_list)
 
-    # historic heat have a decreasing factor. here use 1/2
+    # historic heat have a decreasing factor. here use 0.8
     # added up
-    heatSum = heat+np.mean(df.heatmaps)*0.9
+    heatSum = heat+np.mean(df.heatmaps)*0.8
     # add the current heat to deque
     df.heatmaps.append(heat)
 
@@ -195,3 +197,18 @@ def heatmap(image,box_list, threshold =0):
     labels = label(heatmap)
     draw_img = draw_labeled_bboxes(np.copy(image), labels)
     return draw_img
+
+def heatmapImage(image,box_list, threshold =0):
+    # Read in image similar to one shown aboveloe
+    heat = np.zeros_like(image[:,:,0]).astype(np.float)
+    heat = add_heat(heat,box_list)
+
+    # Apply threshold to help remove false positives
+    heatFilted = apply_threshold(heat,threshold)
+    # Visualize the heatmap when displaying
+    heatmap = np.clip(heatFilted, 0, 255)
+
+    # Find final boxes from heatmap using label function
+    labels = label(heatmap)
+    draw_img = draw_labeled_bboxes(np.copy(image), labels)
+    return heatmap,draw_img
