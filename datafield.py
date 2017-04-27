@@ -23,7 +23,7 @@ class datafield():
         self.svc = None
         self.XScaler = None
         self.heatmaps = deque(maxlen=10)
-
+        self.cnt = 0
     def dataSave(self):
     #save current datafile parameters to .p file
         svc_pickle = {

@@ -181,42 +181,31 @@ def heatmap(image,box_list, threshold =0):
     # Read in image similar to one shown aboveloe
     heat = np.zeros_like(image[:,:,0]).astype(np.float)
     heat = add_heat(heat,box_list)
+    heat1 = apply_threshold(heat,3)
 
-    # historic heat have a decreasing factor. here use 0.9
-
+    # historic heat have a decreasing factor.
     # add the current heat to deque
-    df.heatmaps.append(heat)
+    df.heatmaps.append(heat1)
     # added up
     heatSum = sum(df.heatmaps)
-    print("the max poin at heatmap is {}".format(np.max(heatSum)))
 
     # Apply threshold to help remove false positives
     heatFilted = apply_threshold(heatSum,threshold)
     # Visualize the heatmap when displaying
     heatmap = np.clip(heatFilted, 0, 255)
+    #print("at frame {}, the max poin at heatsum is {},heat:{},heat1:{},heatmap:{}".format(df.cnt,np.max(heatSum),np.max(heat),np.max(heat1),np.max(heatmap)))
 
     # Find final boxes from heatmap using label function
     labels = label(heatmap)
     draw_img = draw_labeled_bboxes(np.copy(image), labels)
+    df.cnt +=1
+    #text ="Frame:{}, heatsum:{},heat:{},heat1:{},heatmap:{}".format(df.cnt,np.max(heatSum),np.max(heat),np.max(heat1),np.max(heatmap))
+    text1 ="FrameMax:{}, heat:{}".format(df.cnt,np.max(heat))
+    text2 ="heat1:{}".format(np.max(heat1))
+    text3 ="heatsum:{}".format(np.max(heatSum))
+    text4 ="heatmapMax:{}".format(np.max(heatmap))
+    cv2.putText(draw_img,text1,(20, 50),cv2.FONT_HERSHEY_DUPLEX,1,(255, 255, 255),thickness=2)
+    cv2.putText(draw_img,text2,(20, 80),cv2.FONT_HERSHEY_DUPLEX,1,(255, 255, 255),thickness=2)
+    cv2.putText(draw_img,text3,(20, 110),cv2.FONT_HERSHEY_DUPLEX,1,(255, 255, 255),thickness=2)
+    cv2.putText(draw_img,text4,(20, 140),cv2.FONT_HERSHEY_DUPLEX,1,(255, 255, 255),thickness=2)
     return draw_img
-
-def heatmapImage(image,box_list, threshold =0):
-    # Read in image similar to one shown aboveloe
-    heat = np.zeros_like(image[:,:,0]).astype(np.float)
-    heat = add_heat(heat,box_list)
-
-    # historic heat have a decreasing factor. here use 1/2
-    # added up
-    heatSum = heat+np.mean(df.heatmaps)*0.9
-    # add the current heat to deque
-    df.heatmaps.append(heat)
-
-    # Apply threshold to help remove false positives
-    heatFilted = apply_threshold(heatSum,threshold)
-    # Visualize the heatmap when displaying
-    heatmap = np.clip(heatFilted, 0, 255)
-
-    # Find final boxes from heatmap using label function
-    labels = label(heatmap)
-    draw_img = draw_labeled_bboxes(np.copy(image), labels)
-    return heatmap,draw_img
