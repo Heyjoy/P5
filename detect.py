@@ -193,11 +193,11 @@ def heatmap(image,box_list, threshold =0):
     heatFilted = apply_threshold(heatSum,threshold)
     # Visualize the heatmap when displaying
     heatmap = np.clip(heatFilted, 0, 255)
-    #print("at frame {}, the max poin at heatsum is {},heat:{},heat1:{},heatmap:{}".format(df.cnt,np.max(heatSum),np.max(heat),np.max(heat1),np.max(heatmap)))
-
     # Find final boxes from heatmap using label function
     labels = label(heatmap)
     draw_img = draw_labeled_bboxes(np.copy(image), labels)
+
+    # print some values on the screen.
     df.cnt +=1
     #text ="Frame:{}, heatsum:{},heat:{},heat1:{},heatmap:{}".format(df.cnt,np.max(heatSum),np.max(heat),np.max(heat1),np.max(heatmap))
     text1 ="FrameMax:{}, heat:{}".format(df.cnt,np.max(heat))

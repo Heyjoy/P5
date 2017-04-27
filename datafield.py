@@ -5,7 +5,7 @@ class datafield():
     def __init__(self):
         self.cars = []
         self.notcars = []
-        self.TrainTestSplitSize = 0.2
+        self.TrainTestSplitSize = 0.8
         self.X_train, self.X_test, self.y_train, self.y_test = None,None,None,None
 
         # will save/load parameters with *.p file

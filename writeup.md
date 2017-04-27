@@ -35,22 +35,21 @@ The goals / steps of this project are the following:
 
 You're reading it!
 
-### Project files
+### Project files:
 
-* main.py main function, creating the vedio and working steps for this project
-* detect.py main module, which have the car detect functions and result image creating.
-* classifier.py include the classifier related training methods and tools
-* extraction.py include features extraction tools and functions
-
-* datafield.py include all adjustable hyperparameters
-* utils.py include other support funtion.
+* `main.py` main function, creating the vedio and working steps for this project
+* `detect.py `main module, which have the car detect functions and result image creating.
+* `classifier.py` include the classifier related training methods and tools
+* `extraction.py` include features extraction tools and functions
+* `datafield.py` include all adjustable hyperparameters
+* `utils.py` include other support funtion.
 
 
 ### Histogram of Oriented Gradients (HOG)
 
 #### 1. Explain how (and identify where in your code) you extracted HOG features from the training images.
 
-The code for this step is contained in the first code cell of the IPython notebook (or in lines # through # of the file called `some_file.py`).  
+The code for this step is contained in` extraction.get_hog_features()` of the file called `extraction.py`.
 
 I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an example of one of each of the `vehicle` and `non-vehicle` classes:
 
@@ -74,8 +73,10 @@ Not Car![alt text][image24]
 Not Car![alt text][image25]
 
 #### 2. Explain how you settled on your final choice of HOG parameters.
+The code for this step is contained in `datafield.py`
+I tried various combinations of parameters and find out the `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)` and `orientations=9` have the best training result.
 
-I tried various combinations of parameters and find out the `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)` and `orientations=9` have the best training result. the parameters set as follow:
+The parameters set as follow:
 
 * Color Space：`'YCrCb'`, `'LUV'`also have similar good performance.
 * Orient：`9`, tried different HOG orientations.
@@ -85,20 +86,20 @@ I tried various combinations of parameters and find out the `pixels_per_cell=(8,
 
 
 #### 3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
+The code for this step is contained in `classifier.py`
+The steps for train the **Linear Support Vector Machine Classifier**
 
-I trained a linear SVM using `spatial features`, `hist features`, `hog features`.
-you can find these function at `extraction.py`
-
-A **Linear Support Vector Machine Classifier** is trained by the mentioned features.
-
-
+1. Read in all the images. 8792 car samples , 8968 non-car samples.
+2. extract `spatial features`, `hist features`, `hog features` features form the image list.
+3. split randomly the dataset to train samples and test samples. here I choose `train:test` as `4:1` get test accuracy 0.99. actually even I use `1:9`, the program can get accuracy 0.98.
 
 
 ### Sliding Window Search
 
 #### 1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
+The code for this step is contained in `detect.py`.
 
-the silder window search, I tried the `perspective and vanishing point concepts`
+The silder window search, I tried the `perspective and vanishing point concepts`
 ,but maybe the way I implemented is not so right, the processing speed are very slowa around `2 s/it`. The reslut are also similar as the `Hog Sub-sampling Window Search concept`.
 
 After these try, I choose the `Hog Sub-sampling Window Search concept` method, you can find the `find_car() `at `detect.py`.
@@ -110,7 +111,7 @@ And for this concept, I setup two different scales: `1`, `1.5`
 |Search2 | 1      | 400 | 496| 50%|
 |...|...|...|...|...|
 
-actually here can use more different scales hot window search, but it will slow done the processing speed. Here has `3.5 it/s`.
+actually here can use more different scales hot window search, but it will slow done the processing speed. Here has `2.5 it/s`, 4 times faster then pervious method.
 
 
 #### 2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
@@ -122,7 +123,6 @@ Try with scale 1.5 ![alt text][image4]
 Try with scale 1 ![alt text][image41]
 
 
-
 ### Video Implementation
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
@@ -130,20 +130,36 @@ Here's a [link to my video result](./project_solution.mp4)
 
 
 #### 2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
+this code are implemented at `detect.heatmap()`in `detect.py.`
 
-I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.  
+what I do is:
 
-### Here are six test image frames and their corresponding heatmaps and output:
+1. Record the positions of positive detections in each frame of the video.  
+2. From the positive detections I created a heatmap
+3. then threshold that map to identify vehicle positions.
+4. I pushed this value to a deque buffer, which have 10 depth
+5. calculate the sum value.
+6. threshold this sum value again with a litter big value, to avoid single false point on single frame.
+7. I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  
+8. I then assumed each blob corresponded to a vehicle, constructed bounding boxes to cover the area of each blob detected.  
+9. print some values on the frame for later diagnostic.
+
+#### Below are a few examples of heatmap and detected-boxes:
 ![alt text][image5]
 
-for this project, a 10 depth deque are also used for heatmaps filter.
-The program save the historic heatmaps and will calculate the mean value of it.
-meanwhile the will add up with the current
+### Discussion
 
+#### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-###Discussion
+As I mentioned above, I spend a lot time on the search window implementation.
+and later spend a lot time for implement a good filter and heatmap.
 
-####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
+For the white car in video, some time in the sunshine can not detect well.
 
-as I mentioned above, I spend a lot time on the search window
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+There may have two reason for it:
+* First is the classifier can not detect this shape with similar color at that time well.
+* Secondly even it can detect but with a few positive point of this car, the filter will also cut it out. if we lower the threshold, a false point will appear.
+
+Therefor what it can be improve in further:
+  1. introduce a CNN for more better classifier
+  2. use more different parameters for hotwindows create, and accordingly change the threshold value.
