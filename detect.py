@@ -4,8 +4,6 @@ from extraction import *
 from scipy.ndimage.measurements import label
 from datafield import *
 
-heatmaps = collections.deque(maxlen=10)
-
 def find_cars(img, ystart, ystop, scale,cells_per_step,svc, X_scaler, orient,
                 pix_per_cell,cell_per_block, spatial_size, hist_bins,
                 spatial_feat,hist_feat,hog_feat):
@@ -73,7 +71,7 @@ def find_cars(img, ystart, ystop, scale,cells_per_step,svc, X_scaler, orient,
                 ytop_draw = np.int(ytop*scale)
                 win_draw = np.int(window*scale)
                 box =((xbox_left, ytop_draw+ystart),(xbox_left+win_draw,ytop_draw+win_draw+ystart))
-                cv2.rectangle(draw_img,box[0],box[1],(0,0,255),6)
+                #cv2.rectangle(draw_img,box[0],box[1],(0,0,255),6)
                 box_list.append(box)
     return box_list
 
@@ -161,6 +159,8 @@ def apply_threshold(heatmap, threshold):
     # heatmap = cv2.resize(heatmap, (80, 45))
     # heatmap = cv2.resize(heatmap, (1280, 720))
     heatmap[heatmap <= threshold] = 0
+    heatmap = cv2.resize(heatmap, (80, 45))
+    heatmap = cv2.resize(heatmap, (1280, 720))
     # Return thresholded map
     return heatmap
 
@@ -179,33 +179,33 @@ def draw_labeled_bboxes(img, labels):
     # Return the image
     return img
 
-def heatmapVedio(image,box_list,threshold=0):
-    #heatmap_sum = sum(df.heatmaps)
-    #heatmap_res = apply_threshold(heatmap_sum,threshold)
-    # Read in image similar to one shown above
-    heatmap = np.zeros_like(image[:,:,0]).astype(np.float)
-    heatmap = add_heat(heatmap,box_list)
+def heatmap(image,box_list, threshold =0):
+    # Read in image similar to one shown aboveloe
+    heat = np.zeros_like(image[:,:,0]).astype(np.float)
+    heat = add_heat(heat,box_list)
+    heat1 = apply_threshold(heat,3)
+    # historic heat have a decreasing factor.
+    # add the current heat to deque
+    df.heatmaps.append(heat1)
+    # added up
+    heatSum = sum(df.heatmaps)
     # Apply threshold to help remove false positives
-    df.heatmaps.append(heatmap)
-    heatmap = apply_threshold(heatmap,threshold)
-    heatmap = sum(df.heatmaps)
-
+    heatFilted = apply_threshold(heatSum,threshold)
     # Visualize the heatmap when displaying
-    heatImage = np.clip(heatmap, 0, 255)
+    heatmap = np.clip(heatFilted, 0, 255)
     # Find final boxes from heatmap using label function
-    labels = label(heatImage)
-    resultImage = draw_labeled_bboxes(np.copy(image), labels)
-    return heatImage,resultImage
+    labels = label(heatmap)
+    draw_img = draw_labeled_bboxes(np.copy(image), labels)
 
-def heatmapImage(image,box_list,threshold=0):
-    # Read in image similar to one shown above
-    heatmap = np.zeros_like(image[:,:,0]).astype(np.float)
-    heatmap = add_heat(heatmap,box_list)
-    # Apply threshold to help remove false positives
-    heatmap = apply_threshold(heatmap,threshold)
-    # Visualize the heatmap when displaying
-    heatImage = np.clip(heatmap, 0, 255)
-    # Find final boxes from heatmap using label function
-    labels = label(heatImage)
-    resultImage = draw_labeled_bboxes(np.copy(image), labels)
-    return heatImage,resultImage
+    # print some values on the screen.
+    df.cnt +=1
+    #text ="Frame:{}, heatsum:{},heat:{},heat1:{},heatmap:{}".format(df.cnt,np.max(heatSum),np.max(heat),np.max(heat1),np.max(heatmap))
+    text1 ="FrameMax:{}, heat:{}".format(df.cnt,np.max(heat))
+    text2 ="heat1:{}".format(np.max(heat1))
+    text3 ="heatsum:{}".format(np.max(heatSum))
+    text4 ="heatmapMax:{}".format(np.max(heatmap))
+    cv2.putText(draw_img,text1,(20, 50),cv2.FONT_HERSHEY_DUPLEX,1,(255, 255, 255),thickness=2)
+    cv2.putText(draw_img,text2,(20, 80),cv2.FONT_HERSHEY_DUPLEX,1,(255, 255, 255),thickness=2)
+    cv2.putText(draw_img,text3,(20, 110),cv2.FONT_HERSHEY_DUPLEX,1,(255, 255, 255),thickness=2)
+    cv2.putText(draw_img,text4,(20, 140),cv2.FONT_HERSHEY_DUPLEX,1,(255, 255, 255),thickness=2)
+    return draw_img
